@@ -32,451 +32,160 @@ Siguiendo con la misma línea, se han seguido las directrices marcadas por el es
 <br>
 El diseño de la solución se puede visualizar en el siguiente UML, en el que se encuentran las principales funciones de cada clase. Se ha obviado añadir los atributos y variables para una visualización más clara y precisa. Se busca que el UML aporte claridad a cómo heredan las clases entre sí y cómo está distribuida la funcionalidad. <br><br>
 
-> [!NOTE]
-> En el editor no dejaba añadir textos para poner los metodos de las clases pero casi todas las clases tienen unicamente un metodo check que devuelve un booleano.
 <br>
 
 ![Práctica 1 UML](https://github.com/IAV24-G10/IAV24-G10-P3/assets/60969767/1d85040c-a766-43ad-acdb-3ea3e9067bfa)<br>
 
-Lo que vamos a realizar para resolver esta práctica son varios modelos de pseudocódigo de percepción por vista u oído, movimiento, dirección, llegada, desplazamiento, merodeo y navegación mediante A*. Todos ellos en movimiento dinámico descritos en la documentación de la [Práctica 1](https://github.com/IAV24-G10/IAV24-G10-P1) y [Práctica 3 de IAV](https://github.com/IAV24-G10/IAV24-G10-P3).
-<br><br>
-#### Maquina de estados de los guardas
-<br>
+#### Calcular disparo
 
-                    +------------------+           +------------------+
-                    |     Patrulla     | --------> |   Persecución    |
-                    +------------------+   ve a    +------------------+
-                           ^  |                  |   ^          |
-                           |  |                  |   |          | cerca
-         recarga completa  |  |  sin munición    |   |          v
-                           |  |                  |   |    +----------------+
-                           |  |                  +---+    |     Ataque     |
-                           |  +-------------------------> +----------------+
-                           |           pierde a Néstor           |  ^
-                           |                                     |  | Néstor escapa
-                           |                                     |  |
-                           |                                     v  |
-                     +-------------------+              sin munición |
-                     |      Recarga      | <------------------------+
-                     +-------------------+
-
-<br>
-
-#### Árbol de decisiones
-
-<br>
-Los nodos dentro del árbol de deciones pueden ser decisiones o acciones.
-<br>
-
-Para los nodos del árbol de decisiones usaremos como base la clase:
+Para calcular la trayectoria del disparo, teniendo en cuenta la parabola
+producida por la fuerza de la gravedad, se usara el siguiente pseudo codigo:
 <br>
 
 ```
-class DecisionTreeNode:
-  function makeDecision() -> DecisionTreeNode # Recursively walks through the tree
-```
+function calculateFiringSolution(start: Vector, end: Vector, muzzleV: float, gravity: Vector) -> Vector:
+  # Calculate the vector from the target back to the start.
+  delta: Vector = start - end
 
-<br><br>
-Para las acciones usaremos como base la siguiente clase:
-<br>
-```
-class Action extends DecisionTreeNode:
-  function makeDecision() -> DecisionTreeNode:
-    return this
-```
-<br><br>
-Para las decisiones usaremos como base la siguiente clase:
-<br>
+  # Calculate the real-valued a,b,c coefficients of a
+  # conventional quadratic equation.
+  a = gravity.squareMagnitude()
+  b = -4 * (dotProduct(gravity, delta) + muzzleV * muzzleV)
+  c = 4 * delta.squareMagnitude()
 
-```
-class Decision extends DecisionTreeNode:
-  trueNode: DecisionTreeNode
-  falseNode: DecisionTreeNode
-  function testValue() -> any
-  function getBranch() -> DecisionTreeNode # carries out the test
-  function makeDecision() ->DecisionTreeNode # Recursively walks through the tree
-```
-<br><br>
-Especializamos la clase decision:
-<br>
-```
-class FloatDecision extends Decision:
-  minValue: float
-  maxValue: float
+  # Check for no real solutions.
+  b2minus4ac = b * b - 4 * a * c
+  if b2minus4ac < 0:
+    return null
 
-  function testValue() -> float
-  
-  function getBranch() -> DecisionTreeNode:
-    if maxValue >= testValue >= minValue:
-      return trueNode
+  # Find the candidate times.
+  time0 = sqrt((-b + sqrt(b2minus4ac)) / (2 * a))
+  time1 = sqrt((-b - sqrt(b2minus4ac)) / (2 * a))
+
+  # Find the time to target.
+  if time0 < 0:
+    if time1 < 0:
+      # We have no valid times.
+      return null
     else:
-      return falseNode
-```
-<br><br>
-Definimos el método makeDecision para que sea recorsiva y recorra el árbol de arriba a abajo:
-<br>
-```
-class Decision extends DecisionTreeNode:
-  function makeDecision() -> DecisionTreeNode:
-
-    # Make the decision and recurse based on the result
-    branch: DecisionTreeNode = getBranch()
-    return branch.makeDecision()
-```
-
-<br><br>
-La siguiente clase sirve para arboles con múltiples ramas:
-<br>
-```
-class MultiDecision extends DecisionTreeNode:
-  daughterNodes: DecisionTreeNode
-
-  function testValue() -> int
-
-  # Carries out the test and returns the node to follow
-  function getBranch() -> DecisionTreeNode:
-    return daughterNodes[testValue]
-
-  # Recursively runs the algorithm, exactly as before
-  function makeDecision() -> DecisionTreeNode:
-    branch: DecisionTreeNode = getBranch()
-    return branch.makeDecision()
-```
-
-<br><br>
-#### Máquina de estados
-<br>
-El siguiente pseudocodigo representa una maquina de estados:
-<br>
-
-```
-class StateMachine:
-
-  # Holds the initial state
-  initialState: State
-
-  # Holds the current state
-  currentState: State = initialState
-
-  # Checks and applies transitions, returning a list of
-  # actions.
-  function  update() -> Action[]:
-
-    # Assume no transition is triggered
-    triggered: Transition = null
-  
-    # Check through each transition and store the first
-    # one that triggers.
-    for transition in currentState.getTransitions():
-      if transition.isTriggered():
-        triggered = transition
-        break
-  
-    # Check if we have a transition to fire
-    if triggered:
-      # Find the target state
-      targetState = triggered.getTargetState()
-  
-      # Add the exit action of the old state, the
-      # transition action and the entry for the new state.
-      actions = currentState.getExitAction()
-      actions += triggered.getAction()
-      actions += targetState.getEntryAction()
-    
-      # Complete the transition and return the action list
-      currentState = targetState
-      return actions
-    
-    # Otherwise just return the current state’s actions
+      ttt = time1
+  else:
+    if time1 < 0:
+      ttt = time0
     else:
-      return currentState.getAction()
+      ttt = min(time0, time1)
+
+  # Return the firing vector.
+  return (delta * 2 - gravity * (ttt * ttt)) / (2 * muzzleV * ttt)
 ```
-<br>
-La maquina de estados esta formado por estados y transiciones. Se usará para definir los estados de los enemigos:
 <br><br>
-
-```
-class State:
-  function getAction() -> Action[]
-  function getEntryAction() -> Action[]
-  function getExitAction() -> Action[]
-  function getTransitions() -> Transition[]
-```
+#### Refinar ángulo
+<br>
+El siguiente pseudocodigo sirve para reajustar el ángulo de disparo en caso de haber una fuerza externa ejerciendo sobre el proyectil, por ejemplo, resistencia del aire:
 <br>
 
 ```
-class Transition:
-  actions: Action[]
-  function getAction() -> Action[]:
-    return actions
+function refineTargeting(start: Vector, end: Vector, muzzleV: float, gravity: Vector, margin: float) -> Vector:
 
-  targetState: State
-  function getTargetState() -> State:
-    return targetState
+  # Calculate a firing solution based on a firing angle.
+  function checkAngle(angle):
+    deltaPosition: Vector = target - source
+    direction = convertToDirection(deltaPosition, angle)
+    distance = distanceToTarget(direction, source, target, muzzleV)
+    return direction, distance
 
-  condition: Condition
-  function isTriggered() -> bool:
-    return condition.test()
-```
-<br>
-La siguiente clase es la base para la clase condicion
-<br><br>
+  # Take an initial guess using the dragless firing solution.
+  direction: Vector = calculateFiringSolution( source, target, muzzleVelocity, gravity)
 
-```
-class Condition:
-  function test() -> bool
-```
-<br>
-Las siguientes clases representan las posible condiciones. (Not, And, Or y si un float esta en un rango):
-<br><br>
-
-```
-class FloatCondition extends Condition:
-  minValue: float
-  maxValue: float
-
-  function testValue() -> float # Pointer to the game data we’re interested in
-
-  function test() -> bool:
-    return minValue <= testValue <= maxValue
-
-class AndCondition extends Condition:
-  conditionA: Condition
-  conditionB: Condition
-
-  function test() -> bool:
-    return conditionA.test() and conditionB.test()
-
-class NotCondition extends Condition:
-  condition: Condition
+  # Check if this is good enough.
+  distance = distanceToTarget(direction, source, target, muzzleV)
+  if -margin < distance < margin:
+    return direction
   
-  function test() -> bool:
-    return not condition.test()
+  # Otherwise we will binary search, but we must ensure our minBound
+  # undersoots and our maxBound overshoots.
+  angle: float = asin(direction.y / direction.length())
+  if distance > 0:
+    # We’ve found a maximum bound. Use the shortest possible shot
+    # (shooting straight down) as the minimum bound.
+    maxBound = angle
+    minBound = - pi / 2
+    direction, distance = checkAngle(minBound)
+    if -margin < distance < margin:
+      return direction
 
-class OrCondition extends Condition:
-  conditionA: Condition
-  conditionB: Condition
+  # Otherwise we need to check we can find a maximum bound: maximum
+  # distance is achieved when we fire at 45 degrees = pi / 4.
+  else:
+    minBound = angle
+    maxBound = pi / 4
+    direction, distance = checkAngle(maxBound)
+    if -margin < distance < margin:
+      return direction
 
-  function test() -> bool:
-    return conditionA.test() or conditionB.test()
-```
-<br><br>
+  # Check if our longest shot can’t make it.
+  if distance < 0:
+    return null
 
-#### Árbol de comportamiento
-<br>
-La base para las tareas
-<br>
+  # Now we have a minimum and maximum bound, so binary search.
+  distance = infinity
+  while abs(distance) >= margin:
+  angle = (maxBound - minBound) / 2
+  direction, distance = checkAngle(angle)
 
-```
-class Task:
-  function run -> bool
-```
-<br><br>
-Si las tareas se van realizando de forma consecutiva  
-<br>
+  # Change the appropriate bound.
+  if distance < 0:
+    minBound = angle
+  else:
+    maxBound = angle
 
-```
-class Selector extends Task:
-  children: Task[]
-
-  function run() -> bool:
-    for c in children:
-      if c.run()
-        return true
-      return false
-```
-<br><br>
-Si las tareas se van realizando de forma secuencial
-<br>
-
-```
-class Sequence extends Task:
-  children: Task[]
-
-  function run() -> bool:
-    for c in children:
-      if not c.run()
-        return false
-      return true
-```
-<br><br>
-Esta seria la explicacion del esquema de la maquina de estados
-<br>
-```
-Árbol de Comportamiento de Néstor:
-
-Selector Principal
-
-Asegura que se tomen decisiones a alto nivel para cambiar entre comportamientos críticos.Secuencia (Escapar)
-  Prioriza el escape si es posible y seguro.
-  - Selector (Camino Seguro a la Salida)
-      - Tarea (Buscar Camino Libre de Guardias)
-      - Tarea (Usar Escondites)
-    - Tarea (Mover hacia la Salida)
-
-  - Secuencia (Recargar Energía)
-    Maneja la energía de Néstor, crucial para su movilidad y capacidad de escape.
-      - Condición (Energía Baja)
-      - Selector (Obtener Energía)
-          - Tarea (Ir a Cápsula de Energía más Cercana)
-          - Tarea (Esperar/Buscar Nueva Cápsula)
-
-  - Secuencia (Evitar Guardias)
-    Toma acciones cuando los guardias están cerca o han detectado a Néstor.
-      - Condición (Guardia Cercano)
-      - Selector (Evadir o Esconderse)
-          - Tarea (Usar Escondites)
-          - Tarea (Mover Hacia Zona Segura)
-
-  - Secuencia (Interacción con Botones y Puertas)
-    Maneja la interacción con elementos del entorno que son esenciales para abrir rutas o bloquear seguimientos.
-      - Condición (Puerta Cerrada en la Ruta)
-      - Selector (Operar Botones)
-          - Tarea (Ir al Botón Correspondiente)
-          - Tarea (Activar Botón)
-
-Explicación del Árbol
-     - Selector Principal: Es el nodo raíz que determina cuál secuencia de comportamientos ejecutar basada en la situación
-                           actual. Este selector siempre evaluará en orden para priorizar el escape sobre otras acciones,
-                           a menos que la salud de Néstor esté críticamente baja o haya una amenaza inminente de un guardia.
-
-     - Secuencia (Escapar): Este comportamiento se activa si hay un camino claro y seguro hacia la salida. Utiliza un
-                            sub-selector para determinar el mejor camino y procede a mover a Néstor hacia la salida.
-
-     - Secuencia (Recargar Energía): Si la energía de Néstor es baja, este comportamiento toma prioridad (a menos que un
-                                     escape seguro esté inmediatamente disponible). Busca la cápsula de energía más cercana
-                                     o espera a que una esté accesible si todas están lejos o en áreas de alto riesgo.
-
-     - Secuencia (Evitar Guardias): Activa cuando hay guardias cerca. Néstor intentará usar escondites o moverse a zonas fuera
-                                    del alcance visual de los guardias para evitar la detección y ataque.
-
-     - Secuencia (Interacción con Botones y Puertas): Cuando una ruta está bloqueada por una puerta, esta secuencia guía a
-                                                      Néstor a operar botones para abrir la ruta o cerrarla detrás de él para
-                                                      bloquear a los guardias.
-
+  return direction
 ```
 <br>
-
-Lo anterior explicado se puede visualizar en el siguiente grafo:
-
+El siguiente pseudocodigo sirve para convertir una posición y un ángulo a una dirección.
 <br>
 
-![Selector principal](https://github.com/IAV24-G10/IAV24-G10-P3/assets/95546683/34c9b9cc-bd11-41ee-b74d-9b51913b8694)
+```
+function convertToDirection(deltaPosition: Vector, angle: float):
+  # Find the planar direction.
+  direction = deltaPosition
+  direction.y = 0
+  direction.normalize()
 
-<br><br>
+  # Add in the vertical component.
+  direction *= cos(angle)
+  direction.y = sin(angle)
+  
+  return direction
+```
+<br><br><br>
 
-## Pruebas y métricas
+## PRUEBAS Y METRICAS
 
-
-Característica A: Mundo virtual
 <table>
-    <tr>
-        <th><b>A.1</b></th>
-        <th>Probar en el nivel 1 el movimiento de robot.</th>
-    </tr>
-     <tr>
-        <th><b>A.2</b></th>
-        <th>Probar que funciona el zoom en todos los niveles.</th>
-    </tr>
-    
-</table>
-<br>
-Característica B: Puertas y escondites
-<table>
-    <tr>
-        <th><b>B.1</b></th>
-        <th>Las puertas, cuando están cerradas, bloquean tanto la visibilidad de los guardias como el movimiento de todos los robots. </th>
-    </tr>
-    <tr>
-        <th><b>B.2</b></th>
-        <th>Los escondites bloquean la visibilidad de los guardias.</th>
-    </tr>
-    <tr>
-        <th><b>B.3</b></th>
-        <th>Las paredes bloquean la visibilidad de los guardias.</th>
-    </tr>
-    
-</table>
-<br>
-Característica C: Guardias
-<table>
-    <tr>
-        <th><b>C.1</b></th>
-        <th>Cuando están en idle, los guardias permanecen en un estado de patrulla empezando y acabando en su base. Comprobar en dos guardias distintos sus puntos de patrulla.</th>
-    </tr>
-    <tr>
-        <th><b>C.2</b></th>
-        <th>Si detectan al jugador con su campo de visión, los guardias empiezan a perseguirlo y dispararle.</th>
-    </tr>
-    <tr>
-        <th><b>C.3</b></th>
-        <th>Al matar al jugador o perderlo de vista, los guardias vuelven a patrullar.</th>
-    </tr>
-     <tr>
-        <th><b>C.4</b></th>
-        <th>Comprobar que al quedarse sin munición, los guardias vuelven a su base a recargar.</th>
-    </tr>
-</table>
-<br>
-Característica D: Árbol de comportamientos
-<table>
-    <tr>
-        <th><b>D.1</b></th>
-        <th>Probar si la IA es capaz de sacar a Néstor del escenario de ejemplo con vida.</th>
-    </tr>
-   <tr>
-        <th><b>D.2</b></th>
-        <th>Néstor cambia su rumbo y recarga vida cuando le queda menos de 1/3.</th>
-    </tr>
-</table>
-<br>
-Característica E: Memoria
-<table>
-    <tr>
-        <th><b>E.1</b></th>
-        <th>Teniendo memoria, la IA puede sacar a Néstor con vida del nivel 1.</th>
-    </tr>
   <tr>
-        <th><b>E.2</b></th>
-        <th>Teniendo memoria, la IA puede sacar a Néstor con vida del nivel 2.</th>
-    </tr>
-  <tr>
-        <th><b>E.3</b></th>
-        <th>Teniendo memoria, la IA puede sacar a Néstor con vida del nivel 3 (nivel prueba).</th>
-    </tr>
+    <th>Cañon fijo con objetivos con movimiento lineal</th>
+    <th>Cañon fijo con objetivos con movimiento circular</th>
+    <th>Cañon fijo con objetivos con movimiento complejo</th>
+    <th>Cañon en movimiento con objetivos con movimientos lineales</th>
+    <th>Cañon en movimiento con objetivos con movimiento circular</th>
+    <th>Cañon en movimiento con objetivos con movimiento complejo</th>
+  </tr>
 </table>
-<br>
-
-- [Vídeo con la batería de pruebas](https://youtu.be/Gc9cRzQK4xI)
-
-Por si acaso no va el vídeo en youtube porque lleva una hora procesándose: 
-[Enlace a drive](https://drive.google.com/file/d/1g9pz_VC4k-2DsYKUajGFlNIrj6LF4NeT/view?usp=sharing)
 
 <br><br><br>
 
-
-
 ## Producción
 
-Las tareas se han realizado y el esfuerzo ha sido repartido entre los autores. Esto queda documentado en la tabla siguiente de manera general, aunque se encuentra más profundamente documentado en la [pestaña de Proyectos actualizada](https://github.com/orgs/IAV24-G10/projects/3) de GitHub.
+Como esta practica es individual solo se usara la tabla de abajo para el seguimiento de las tareas pendientes.
 
 | Estado  |  Tarea  |  Fecha  |  
 |:-:|:--|:-:|
-| ✔ | Diseño: Documentación inicial | 18-04-2024 |
-| ✔ | Característica A: Mundo virtual | 28-04-2024 |
-| ✔ | Característica B: Puertas | 28-04-2024 |
-| ✔ | Característica C: Guardias | 28-04-2024 |
-| ✔ | Característica D: Protagonista | 28-04-2024 |
-| ✔ | Característica E: Pizarra | 28-04-2024 |
-| ✔ | Diseño: Documentación final | 28-04-2024 |
-| :x: | Vídeo | 28-04-2024 |
-|   |  | |
-|  | OPCIONAL |  |
-| :x: | Movimiento e interacción con ratón y WASD. Cambio con barra espaciadora | - |
-| :x: | Máquina de estados jerárquica para los guardias | - |
-| :x: | Escenario con geometría compleja 3D. Varios niveles. | - |
-| :x: | Mecanismos más complejos de escenario (puertas giratorias, ascensores...) | - |
-| :x: | Mejora de gestión sensorial del protagonista con retroalimentación visual | - |
+| ✔ | Diseño: Documentación inicial | 16-05-2024 |
+| :x: | Plantilla con la base del proyecto | 20-05-2024 |
+| :x: | Implementacion del codigo con la IA | 24-05-2024 |
+| :x: | Vídeo | 27-05-2024 |
+| :x: | Pruebas | 27-05-2024 |
 
 
 <br><br>
@@ -486,11 +195,4 @@ Las tareas se han realizado y el esfuerzo ha sido repartido entre los autores. E
 Los recursos de terceros utilizados son de uso público.
 
 - *AI for Games*, Ian Millington.
-- [Behaviour Bricks Documentation](https://bb.padaonegames.com/)
-- [Kaykit Medieval Builder Pack](https://kaylousberg.itch.io/kaykit-medieval-builder-pack)
-- [Federico Peinado, Robot a la Fuga, Narratech](https://narratech.com/es/inteligencia-artificial-para-videojuegos/decision/robot-a-la-fuga/)
-- [Federico Peinado, Representación del conocimiento, Narratech](https://narratech.com/es/inteligencia-artificial-para-videojuegos/decision/representacion-del-conocimiento/)
-- [Fededrico Peinado, Máquina de estados, Narratech](https://narratech.com/es/inteligencia-artificial-para-videojuegos/decision/maquina-de-estados/)
-- [Federico Peinado, Árbol de comportamiento, Narratech](https://narratech.com/es/inteligencia-artificial-para-videojuegos/decision/arbol-de-comportamiento/)
-- [Federico Peinado, Reglas y planificación, Narratech](https://narratech.com/es/inteligencia-artificial-para-videojuegos/decision/reglas-y-planificacion/)
-- [Federico Peinado, Probabilidad y utilidad, Narratech](https://narratech.com/es/inteligencia-artificial-para-videojuegos/decision/probabilidad-y-utilidad/)
+- UNITY ver 2022.3.5f1
