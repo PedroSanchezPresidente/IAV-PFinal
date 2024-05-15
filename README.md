@@ -162,15 +162,16 @@ function convertToDirection(deltaPosition: Vector, angle: float):
 
 ## PRUEBAS Y METRICAS
 
+Se harán las siguientes pruebas:
+
 <table>
-  <tr>
-    <th>Cañon fijo con objetivos con movimiento lineal</th>
-    <th>Cañon fijo con objetivos con movimiento circular</th>
-    <th>Cañon fijo con objetivos con movimiento complejo</th>
-    <th>Cañon en movimiento con objetivos con movimientos lineales</th>
-    <th>Cañon en movimiento con objetivos con movimiento circular</th>
-    <th>Cañon en movimiento con objetivos con movimiento complejo</th>
-  </tr>
+  <tr><th>Cañon fijo con objetivos con movimiento lineal</th></tr>
+  <tr><th>Cañon fijo con objetivos con movimiento circular</th></tr>
+  <tr><th>Cañon fijo con objetivos con movimiento complejo</th></tr>
+  <tr><th>Cañon en movimiento con objetivos con movimientos lineales</th></tr>
+  <tr><th>Cañon en movimiento con objetivos con movimiento circular</th></tr>
+  <tr><th>Cañon en movimiento con objetivos con movimiento complejo</th></tr>
+  <tr><th>Todas las pruebas anteriores pero el proyectil tiene resistencia al viento</th></tr>
 </table>
 
 <br><br><br>
