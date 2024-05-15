@@ -35,6 +35,9 @@ El diseño de la solución se puede visualizar en el siguiente UML, en el que se
 <br>
 
 ![UML_PFINAL_IAV](https://github.com/PedroSanchezPresidente/IAV-PFinal/assets/60969767/9f54a841-fd77-42d5-a513-44ec308a881f)
+
+<br>
+En la clase ShootComponent estará la mayoria del codigo con la IA de disparo.
 <br><br>
 
 #### Calcular disparo
