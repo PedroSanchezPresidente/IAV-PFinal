@@ -34,7 +34,8 @@ El diseño de la solución se puede visualizar en el siguiente UML, en el que se
 
 <br>
 
-![Práctica 1 UML](https://github.com/IAV24-G10/IAV24-G10-P3/assets/60969767/1d85040c-a766-43ad-acdb-3ea3e9067bfa)<br>
+![UML_PFINAL_IAV](https://github.com/PedroSanchezPresidente/IAV-PFinal/assets/60969767/9f54a841-fd77-42d5-a513-44ec308a881f)
+<br><br>
 
 #### Calcular disparo
 
