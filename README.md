@@ -8,14 +8,17 @@
 - Pedro Sánchez Vela ([PedroSanchezPresidente](https://github.com/PedroSanchezPresidente))
 
 ## Propuesta
+> [!NOTE]
+> He cambiado la parte de los objetivos moviles de esta sección debido a que malinterpreté el código del libro y solo sirve para objetivos estáticos,
+> ya que se consigue el ángulo de tiro dependiendo unicamente de todos los factores que afentan a la bala.
 
 Esta práctica será sobre el capítulo 3.5 "Predicting Physics" de la tercera edicion del libro "AI for Games" de IAN Millintog.
 
-La práctica consistirá en desarrollar un prototipo de IA para Videojuegos, sera una simulación de tiro al blanco con objetivos moviles, caida de bala y el cañon que la dispara también estrara en movimiento.
-La IA a implementar tendrá que ajustar el angulo de disparo, prediciendo la caida de bala y posicion del objetivo para cuando la bala llege.
+La práctica consistirá en desarrollar un prototipo de IA para Videojuegos, sera una simulación de tiro al blanco con objetivos státicos, caida de bala y el cañon que la dispara se podrá mover en movimiento.
+La IA a implementar tendrá que ajustar el ángulo de disparo, prediciendo la caida de bala y la resistencia del viento.
 
 ## Punto de partida
-Se parte de un proyecto vacio de **Unity 2022.3.5f1**. 
+Se parte de un proyecto vacío de **Unity 2022.3.5f1**. 
 
 Los modelos de las dianas y los cañones, además de los script de movimiento son originales del autor.
 
@@ -166,9 +169,7 @@ function convertToDirection(deltaPosition: Vector, angle: float):
 
 ## PRUEBAS Y METRICAS
 > [!NOTE]
-> He cambiado todas las pruebas debido a que malinterpreté el código del libro y solo sirve para objetivos estáticos,
-> ya que se consigue el angulo de tiro dependiendo unicamente de todos los factores que afentan a la bala.
-> Por lo que las nuevas pruebas harán énfasis en los cambios en el comportamiento de la bala y no de los objetivos.
+> Las nuevas pruebas harán énfasis en los cambios en el comportamiento de la bala y no de los objetivos.
 
 Se harán las siguientes pruebas:
 
