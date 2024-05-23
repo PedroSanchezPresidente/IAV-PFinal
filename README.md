@@ -37,10 +37,11 @@ El diseño de la solución se puede visualizar en el siguiente UML, en el que se
 
 <br>
 
-![UML_PFINAL_IAV](https://github.com/PedroSanchezPresidente/IAV-PFinal/assets/60969767/9f54a841-fd77-42d5-a513-44ec308a881f)
+![UML_PFINAL_IAV](https://github.com/PedroSanchezPresidente/IAV-PFinal/assets/60969767/98f15bd8-e0a3-40e7-8a3c-1bc3004f629b)
 
 <br>
-En la clase ShootComponent estará la mayoria del codigo con la IA de disparo.
+En la clase CanonComponent estará la mayoria del codigo con la IA de disparo.
+Las demas son simplemente para limpiar las balas.
 <br><br>
 
 #### Calcular disparo
