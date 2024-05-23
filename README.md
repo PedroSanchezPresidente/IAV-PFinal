@@ -168,6 +168,7 @@ function convertToDirection(deltaPosition: Vector, angle: float):
 > [!NOTE]
 > He cambiado todas las pruebas debido a que malinterpreté el código del libro y solo sirve para objetivos estáticos,
 > ya que se consigue el angulo de tiro dependiendo unicamente de todos los factores que afentan a la bala.
+> Por lo que las nuevas pruebas harán énfasis en los cambios en el comportamiento de la bala y no de los objetivos.
 
 Se harán las siguientes pruebas:
 
