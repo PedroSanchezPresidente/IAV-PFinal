@@ -165,17 +165,21 @@ function convertToDirection(deltaPosition: Vector, angle: float):
 <br><br><br>
 
 ## PRUEBAS Y METRICAS
+> [!NOTE]
+> He cambiado todas las pruebas debido a que malinterpreté el código del libro y solo sirve para objetivos estáticos,
+> ya que se consigue el angulo de tiro dependiendo unicamente de todos los factores que afentan a la bala.
 
 Se harán las siguientes pruebas:
 
 <table>
-  <tr><th>Cañon fijo con objetivos con movimiento lineal</th></tr>
-  <tr><th>Cañon fijo con objetivos con movimiento circular</th></tr>
-  <tr><th>Cañon fijo con objetivos con movimiento complejo</th></tr>
-  <tr><th>Cañon en movimiento con objetivos con movimientos lineales</th></tr>
-  <tr><th>Cañon en movimiento con objetivos con movimiento circular</th></tr>
-  <tr><th>Cañon en movimiento con objetivos con movimiento complejo</th></tr>
-  <tr><th>Todas las pruebas anteriores pero el proyectil tiene resistencia al viento</th></tr>
+  <tr><th>Cañon fijo con objetivos a la misma altura</th></tr>
+  <tr><th>Cañon fijo con objetivos a una altura superior</th></tr>
+  <tr><th>Cañon fijo con objetivos escondidos detrás de un muro</th></tr>
+  <tr><th>Cañon en movimiento con objetivos a la misma altura</th></tr>
+  <tr><th>Cañon en movimiento con objetivos a una altura superior</th></tr>
+  <tr><th>Cañon en movimiento con objetivos escondidos detrás de un muro</th></tr>
+  <tr><th>Todas las pruebas anteriores pero la bala tiene resistencia al viento</th></tr>
+  <tr><th>Todas las pruebas pero con distintas velocidades de bala</th></tr>
 </table>
 
 <br><br><br>
@@ -187,7 +191,7 @@ Como esta practica es individual solo se usara la tabla de abajo para el seguimi
 | Estado  |  Tarea  |  Fecha  |  
 |:-:|:--|:-:|
 | ✔ | Diseño: Documentación inicial | 16-05-2024 |
-| :x: | Plantilla con la base del proyecto | 20-05-2024 |
+| ✔ | Plantilla con la base del proyecto | 20-05-2024 |
 | :x: | Implementacion del codigo con la IA | 24-05-2024 |
 | :x: | Vídeo | 27-05-2024 |
 | :x: | Pruebas | 27-05-2024 |
