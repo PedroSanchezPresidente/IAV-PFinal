@@ -138,14 +138,14 @@ function refineTargeting(start: Vector, end: Vector, muzzleV: float, gravity: Ve
   # Now we have a minimum and maximum bound, so binary search.
   distance = infinity
   while abs(distance) >= margin:
-  angle = (maxBound - minBound) / 2
-  direction, distance = checkAngle(angle)
-
-  # Change the appropriate bound.
-  if distance < 0:
-    minBound = angle
-  else:
-    maxBound = angle
+    angle = (maxBound - minBound) / 2
+    direction, distance = checkAngle(angle)
+  
+    # Change the appropriate bound.
+    if distance < 0:
+      minBound = angle
+    else:
+      maxBound = angle
 
   return direction
 ```
