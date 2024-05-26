@@ -17,6 +17,18 @@ Esta práctica será sobre el capítulo 3.5 "Predicting Physics" de la tercera e
 La práctica consistirá en desarrollar un prototipo de IA para Videojuegos, sera una simulación de tiro al blanco con objetivos státicos, caida de bala y el cañon que la dispara se podrá mover en movimiento.
 La IA a implementar tendrá que ajustar el ángulo de disparo, prediciendo la caida de bala y la resistencia del viento.
 
+Los apartados a tratar son:
+
+-A: Crear un escenario con dianas en distintas alturas y con almenos una detrás de un muro. Tambíen una plataforma por donde se moverá el cañón y el propio cañon. El caños se moverá con las teclas A(izquierda) y D(derecha).
+
+-B: Crear una interfaz con la que puedas cambiar la diana a la que disparas, la velocidad de salida de la bala, la resistencia del aire, la gravedad y si se quiere que se lance el proyectil con la trayectoria mas alta posible.
+
+-C: Hacer que el cañon dispare un proyectil prediciendo el ángulo de salida para que alcanze el objetivo teniendo en cuenta la gravedad.
+
+-D: Añadir el drag que se desea a la bala y corregir el ángulo de tiro para que la bala alcanze el objetivo teniendo en cuenta la gravedad y la resistencia del aire.
+
+-E: Hacer un contador que aumente al impactar a un objetivo y scripts necesarios para eliminar las balas que ya han impactado.
+
 ## Punto de partida
 Se parte de un proyecto vacío de **Unity 2022.3.5f1**. 
 
@@ -150,6 +162,15 @@ function refineTargeting(start: Vector, end: Vector, muzzleV: float, gravity: Ve
   return direction
 ```
 <br>
+Aunque no lo parezca esta parte es muy compleja, ya que no hay una forma efectiva de predecir la trayectoria sin antes hacer una simulacion del recorrido.
+Sirve para las IAs de enemigos en simuladores de guerra muy complejos y con nivel de detalle alto.
+Esta predicción se hace en el metodo distanceToTarget y devuelve la distancia más cercana que pasará el proyectil al objetivo con signo.
+Este signo será positivo si se ha pasado de largo y negativo si se ha quedado corto.
+Millington no explica este método y es crucial para que funcione, solo dice lo anteriormente dicho por lo que he tenido que hacer investigación en internet.
+
+Además hay un pequeño fallo justo después de la linea "angle = (maxBound - minBound) / 2" y lo corregí poniendo justo después "angle = angle + minBound".
+Porque sino hay posibilidad de que se quede dentro del while infinitamente, ya que calcula el ángulo intermedio de la diferencia pero no es el ángulo real y podría darse el caso que angle = minBound dando lugar a un while infinito.
+<br><br>
 El siguiente pseudocodigo sirve para convertir una posición y un ángulo a una dirección.
 <br>
 
@@ -205,6 +226,12 @@ Como esta practica es individual solo se usara la tabla de abajo para el seguimi
 ## Referencias
 
 Los recursos de terceros utilizados son de uso público.
+>[!NOTE]
+>ChatGPT no ha sido usado para crear código, sino para buscar enfoques y
+>formulas relaccionadas con la funcionalidad de la funcion distanceToTarget.
 
 - *AI for Games*, Ian Millington.
 - UNITY ver 2022.3.5f1
+- [Federico Peinado, Prueba Individual, Narratech](https://narratech.com/es/docencia/prueba/)
+- [Foro de Unity donde hablan sobre fórmulas del drag](https://forum.unity.com/threads/drag-factor-what-is-it.85504/)
+- [ChatGPT](https://chatgpt.com);
