@@ -248,4 +248,8 @@ Los recursos de terceros utilizados son de uso público.
 - UNITY ver 2022.3.5f1
 - [Federico Peinado, Prueba Individual, Narratech](https://narratech.com/es/docencia/prueba/)
 - [Foro de Unity donde hablan sobre fórmulas del drag](https://forum.unity.com/threads/drag-factor-what-is-it.85504/)
-- [ChatGPT](https://chatgpt.com);
+- [Documentacion Unity](https://docs.unity3d.com)
+- [ChatGPT](https://chatgpt.com)
+- [Arma 3](https://store.steampowered.com/app/107410/Arma_3/?l=spanish)
+- [War Thunder](https://store.steampowered.com/app/236390/War_Thunder/?l=spanish)
+- [From the Depths](https://store.steampowered.com/app/268650/From_the_Depths/?l=spanish)
