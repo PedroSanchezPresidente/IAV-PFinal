@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CanonComponent : MonoBehaviour
 {
@@ -37,13 +39,17 @@ public class CanonComponent : MonoBehaviour
     [SerializeField]
     bool paraboleIfPosible = false;
 
-    Vector3 direction = new Vector3();
+    [SerializeField]
+    float drag = 0;
+
+    Vector3 mDirection = new Vector3();
+    List<Vector3> trajectory = new List<Vector3>();
 
     float timer = 0;
 
     private void Start()
     {
-        direction = new Vector3(velocity,0,0);
+        mDirection = new Vector3(velocity,0,0);
     }
 
     // Update is called once per frame
@@ -51,25 +57,26 @@ public class CanonComponent : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.A))
         {
-            Vector3 targetDest = transform.position + (direction * Time.deltaTime);
+            Vector3 targetDest = transform.position + (mDirection * Time.deltaTime);
             if (targetDest.x < end1.transform.position.x)
                 transform.position = targetDest;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            Vector3 targetDest = transform.position - (direction * Time.deltaTime);
+            Vector3 targetDest = transform.position - (mDirection * Time.deltaTime);
             if (targetDest.x > end2.transform.position.x)
                 transform.position = targetDest;
         }
         if (Input.GetKey(KeyCode.Space) && timer <= 0)
         {
-            Vector3 imp = calculateFiringSolution(target.transform.position);
+            Vector3 imp = refineTargeting(1.5f);
             if (imp != Vector3.zero)
             {
                 errorText.active = false;
                 GameObject obj = Instantiate(bullet, canonExit.transform.position, Quaternion.identity);
                 transform.forward = -imp;
                 obj.GetComponent<Rigidbody>().AddForce(imp * bulletForce, ForceMode.Impulse);
+                obj.GetComponent<Rigidbody>().drag = drag;
             }
             else
                 errorText.active = true;
@@ -77,11 +84,15 @@ public class CanonComponent : MonoBehaviour
         }
         if (timer > 0)
             timer -= Time.deltaTime;
+        foreach (Vector3 point in trajectory)
+        {
+            Debug.DrawLine(point, point + Vector3.up * 0.1f, Color.red, 10f);
+        }
     }
 
-    Vector3 calculateFiringSolution(Vector3 end)
+    Vector3 calculateFiringSolution()
     {
-        Vector3 delta = end - canonExit.transform.position;
+        Vector3 delta = target.transform.position - canonExit.transform.position;
         ;
         float ttt;
 
@@ -119,6 +130,132 @@ public class CanonComponent : MonoBehaviour
         return (2 * delta - Physics.gravity * (ttt * ttt)) / (2 * bulletForce * ttt);
     }
 
+    Vector3 refineTargeting(float margin)
+    {
+        Vector3 direction = calculateFiringSolution();
+        if (drag == 0)
+            return direction;
+
+        float distance = distanceToTarget(direction);
+
+        if(-margin < distance && distance < margin)
+            return direction;
+
+        float angle = Mathf.Asin(direction.y/ direction.magnitude);
+
+        float minBound;
+        float maxBound;
+        if (distance > 0)
+        {
+            maxBound = angle;
+            minBound = Mathf.PI / 2;
+            pair p = checkAngle(minBound);
+            direction = p.direction;
+            distance = p.distance;
+            if (-margin < distance && distance < margin)
+                return direction;
+        }
+        else
+        {
+            minBound = angle;
+            maxBound = Mathf.PI / 4;
+            pair p = checkAngle(maxBound);
+            direction = p.direction;
+            distance = p.distance;
+            if (-margin < distance && distance < margin)
+                return direction;
+
+            if (distance < 0)
+                return Vector3.zero;
+        }
+
+        distance = Mathf.Infinity;
+        while (Mathf.Abs(distance) >= margin)
+        {
+            angle = (maxBound - minBound) / 2;
+            angle += minBound;
+            pair p = checkAngle(angle);
+            direction = p.direction;
+            distance = p.distance;
+
+            if (distance < 0)
+                minBound = angle;
+            else
+                maxBound = angle;
+        }
+
+        return direction;
+    }
+
+    struct pair
+    {
+        public Vector3 direction;
+        public float distance;
+    }
+
+    pair checkAngle(float angle)
+    {
+        Vector3 deltaPos = target.transform.position - canonExit.transform.position;
+        pair p;
+        p.direction = convertToDirection(deltaPos, angle);
+        p.distance = distanceToTarget(p.direction);
+        return p;
+    }
+
+    float distanceToTarget(Vector3 dir)
+    {
+        float sol;
+        float timeStep = 0.1f;
+
+        //calcular distancia, sacar el tiempo en llegar a su plano zy, hallar distancia en y
+        float distance = Mathf.Infinity;
+        Vector3 position = canonExit.transform.position;
+        Vector3 velocity = bulletForce * dir;
+        Vector3 closestPos = new Vector3();
+        trajectory.Clear();
+        int a;
+
+        for (int i = 0; i < 100; i++)
+        {
+            // Update position and velocity
+
+            velocity += Physics.gravity * timeStep;
+            velocity /= 1 + drag * timeStep;
+            position += velocity * timeStep;
+
+            trajectory.Add(position);
+            float actDistance = Vector3.Distance(target.transform.position, position);
+
+            if (distance > actDistance){
+                a = i;
+                distance = actDistance;
+                closestPos = position;
+            }
+        }
+
+        Vector3 targetZX = target.transform.position;
+        targetZX.y = 0;
+        Vector3 positionZX = canonExit.transform.position;
+        positionZX.y = 0;
+
+        sol = Mathf.Sign(Vector3.Distance(closestPos, positionZX) - Vector3.Distance(targetZX, positionZX));
+        sol *= distance;
+
+        return sol;
+    }
+
+    Vector3 convertToDirection(Vector3 deltaPos, float angle)
+    {
+        Vector3 direction = deltaPos;
+        direction.y = 0;
+        direction.Normalize();
+
+        direction *= Mathf.Cos(angle);
+        direction.y = Mathf.Sin(angle);
+
+        return direction;
+    }
+
     public void changeTarget(GameObject newTarget)
     {
         target = newTarget;
@@ -132,5 +269,15 @@ public class CanonComponent : MonoBehaviour
     public void changeParaboleIfPosible(bool b)
     {
         paraboleIfPosible = b;
+    }
+
+    public void changeDrag(float f)
+    {
+        drag = f;
+    }
+
+    public void changeGravity(float g)
+    {
+        Physics.gravity =new Vector3(0,-g,0);
     }
 }
