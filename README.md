@@ -166,8 +166,7 @@ Aunque no lo parezca esta parte es muy compleja, ya que no hay una forma efectiv
 Sirve para las IAs de enemigos en simuladores de guerra muy complejos y con nivel de detalle alto.
 Esta predicción se hace en el metodo distanceToTarget y devuelve la distancia más cercana que pasará el proyectil al objetivo con signo.
 Este signo será positivo si se ha pasado de largo y negativo si se ha quedado corto.
-Millington no explica este método y es crucial para que funcione, solo dice lo anteriormente dicho por lo que he tenido que hacer investigación en internet.
-<br>
+Millington no explica este método y es crucial para que funcione, solo dice lo anteriormente dicho por lo que he tenido que hacer investigación en internet.<br><br>
 Además hay un pequeño fallo justo después de la linea "angle = (maxBound - minBound) / 2" y lo corregí poniendo justo después "angle = angle + minBound".
 Porque sino hay posibilidad de que se quede dentro del while infinitamente, ya que calcula el ángulo intermedio de la diferencia pero no es el ángulo real y podría darse el caso que angle = minBound dando lugar a un while infinito.
 <br><br>
