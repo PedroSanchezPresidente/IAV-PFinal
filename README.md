@@ -18,21 +18,24 @@ La práctica consistirá en desarrollar un prototipo de IA para Videojuegos, ser
 La IA a implementar tendrá que ajustar el ángulo de disparo, prediciendo la caida de bala y la resistencia del viento.
 
 Los apartados a tratar son:
+<table>
+<tr><th>A</th><th>Crear un escenario con dianas en distintas alturas y con almenos una detrás de un muro. Tambíen una plataforma por donde se moverá el cañón y el propio cañon. El caños se moverá con las teclas A(izquierda) y D(derecha).</th></tr>
+<tr><th>B</th><th>Crear una interfaz con la que puedas cambiar la diana a la que disparas, la velocidad de salida de la bala, la resistencia del aire, la gravedad y si se quiere que se lance el proyectil con la trayectoria mas alta posible.</th></tr>
+<tr><th>C</th><th>Hacer que el cañon dispare un proyectil prediciendo el ángulo de salida para que alcanze el objetivo teniendo en cuenta la gravedad.</th></tr>
+<tr><th>D</th><th>Añadir el drag que se desea a la bala y corregir el ángulo de tiro para que la bala alcanze el objetivo teniendo en cuenta la gravedad y la resistencia del aire.</th></tr>
+<tr><th>E</th><th>Hacer un contador que aumente al impactar a un objetivo y scripts necesarios para eliminar las balas que ya han impactado.</th></tr>
+</table>
 
--A: Crear un escenario con dianas en distintas alturas y con almenos una detrás de un muro. Tambíen una plataforma por donde se moverá el cañón y el propio cañon. El caños se moverá con las teclas A(izquierda) y D(derecha).
-
--B: Crear una interfaz con la que puedas cambiar la diana a la que disparas, la velocidad de salida de la bala, la resistencia del aire, la gravedad y si se quiere que se lance el proyectil con la trayectoria mas alta posible.
-
--C: Hacer que el cañon dispare un proyectil prediciendo el ángulo de salida para que alcanze el objetivo teniendo en cuenta la gravedad.
-
--D: Añadir el drag que se desea a la bala y corregir el ángulo de tiro para que la bala alcanze el objetivo teniendo en cuenta la gravedad y la resistencia del aire.
-
--E: Hacer un contador que aumente al impactar a un objetivo y scripts necesarios para eliminar las balas que ya han impactado.
+<br>
 
 ## Punto de partida
 Se parte de un proyecto vacío de **Unity 2022.3.5f1**. 
 
 Los modelos de las dianas y los cañones, además de los script de movimiento son originales del autor.
+
+El diagrama de como debería ser es el siguiente:
+
+![diagrama_IAV](https://github.com/PedroSanchezPresidente/IAV-PFinal/assets/60969767/167bee76-867d-4526-a064-75469ff0de46)
 
 <br><br>
 ## Guía de estilo del código
@@ -57,7 +60,13 @@ Las demas son simplemente para limpiar las balas.
 <br><br>
 
 #### Calcular disparo
+<br>
+Diagrama con la trayectoria de disparo solo con la gravedad, como se puede observar hay 2 posibles trayectorias:
+<br><br>
 
+![driagrama_Gravity_IAV](https://github.com/PedroSanchezPresidente/IAV-PFinal/assets/60969767/f87aa751-a065-468d-8866-9485d05a99e0)
+
+<br>
 Para calcular la trayectoria del disparo, teniendo en cuenta la parabola
 producida por la fuerza de la gravedad, se usara el siguiente pseudo codigo:
 <br>
@@ -100,6 +109,12 @@ function calculateFiringSolution(start: Vector, end: Vector, muzzleV: float, gra
 ```
 <br><br>
 #### Refinar ángulo
+<br>
+Diagrama con la trayectoria de disparo con gravedad y resistencia del aire:
+<br><br>
+
+![diagrama_Drag_IAV](https://github.com/PedroSanchezPresidente/IAV-PFinal/assets/60969767/2e7f7b6d-d74c-4f6b-b35e-8879efeb4413)
+
 <br>
 El siguiente pseudocodigo sirve para reajustar el ángulo de disparo en caso de haber una fuerza externa ejerciendo sobre el proyectil, por ejemplo, resistencia del aire:
 <br>
@@ -215,9 +230,9 @@ Como esta practica es individual solo se usara la tabla de abajo para el seguimi
 |:-:|:--|:-:|
 | ✔ | Diseño: Documentación inicial | 16-05-2024 |
 | ✔ | Plantilla con la base del proyecto | 20-05-2024 |
-| :x: | Implementacion del codigo con la IA | 24-05-2024 |
-| :x: | Vídeo | 27-05-2024 |
+| ✔ | Implementacion del codigo con la IA | 24-05-2024 |
 | :x: | Pruebas | 27-05-2024 |
+| :x: | Vídeo | 27-05-2024 |
 
 
 <br><br>
