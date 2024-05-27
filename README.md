@@ -221,6 +221,9 @@ Se harán las siguientes pruebas:
   <tr><th>Todas las pruebas pero con distintas gravedades</th></tr>
 </table>
 
+<br>
+Hay una posibilidad muy pequeña de que falle el tiro cuando hay resistencia del viento 
+porque el margen de error no está lo suficientemente ajustado.
 <br><br><br>
 
 ## Producción
