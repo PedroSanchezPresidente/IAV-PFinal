@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -43,7 +41,10 @@ public class CanonComponent : MonoBehaviour
     float drag = 0;
 
     Vector3 mDirection = new Vector3();
+
+#if DEBUG
     List<Vector3> trajectory = new List<Vector3>();
+#endif
 
     float timer = 0;
 
@@ -84,10 +85,12 @@ public class CanonComponent : MonoBehaviour
         }
         if (timer > 0)
             timer -= Time.deltaTime;
+#if DEBUG
         foreach (Vector3 point in trajectory)
         {
             Debug.DrawLine(point, point + Vector3.up * 0.1f, Color.red, 10f);
         }
+#endif
     }
 
     Vector3 calculateFiringSolution()
@@ -212,8 +215,9 @@ public class CanonComponent : MonoBehaviour
         Vector3 position = canonExit.transform.position;
         Vector3 velocity = bulletForce * dir;
         Vector3 closestPos = new Vector3();
+#if DEBUG
         trajectory.Clear();
-        int a;
+#endif
 
         for (int i = 0; i < 100; i++)
         {
@@ -222,12 +226,13 @@ public class CanonComponent : MonoBehaviour
             velocity += Physics.gravity * timeStep;
             velocity /= 1 + drag * timeStep;
             position += velocity * timeStep;
-
+#if DEBUG
             trajectory.Add(position);
+#endif
+
             float actDistance = Vector3.Distance(target.transform.position, position);
 
             if (distance > actDistance){
-                a = i;
                 distance = actDistance;
                 closestPos = position;
             }
