@@ -218,6 +218,7 @@ Se harán las siguientes pruebas:
   <tr><th>Cañon en movimiento con objetivos escondidos detrás de un muro</th></tr>
   <tr><th>Todas las pruebas anteriores pero la bala tiene resistencia al viento</th></tr>
   <tr><th>Todas las pruebas pero con distintas velocidades de bala</th></tr>
+  <tr><th>Todas las pruebas pero con distintas gravedades</th></tr>
 </table>
 
 <br><br><br>
