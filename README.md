@@ -224,6 +224,9 @@ Se harán las siguientes pruebas:
 <br>
 Hay una posibilidad muy pequeña de que falle el tiro cuando hay resistencia del viento 
 porque el margen de error no está lo suficientemente ajustado.
+
+<br><br>
+[Video con la bateria de pruebas](https://www.youtube.com/watch?v=BgXPn1oNfJQ)
 <br><br><br>
 
 ## Producción
